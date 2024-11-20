@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const Level = require('../models/levelModel');
+const Level = require('../Models/levelModel');
 
 // Get all levels
 exports.getLevel= asyncHandler(async (req, res) => {
