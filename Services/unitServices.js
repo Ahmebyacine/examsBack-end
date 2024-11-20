@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const Unit = require('../models/unitModel');
+const Unit = require('../Models/unitModel');
 const ApiError = require('../utils/ApiError');
 
 exports.getUnits=asyncHandler(async (req, res) => {
