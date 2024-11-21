@@ -41,7 +41,7 @@ exports.addExercise = asyncHandler(async (req, res, next) => {
 // @route   GET /api/exercises
 // @access  Public
 exports.allExercise= asyncHandler(async (req, res) => {
-  const exercises = await Exercise.find({});
+  const exercises = await Exercise.find().populate('level').populate('material').populate('unit');
   res.status(200).json(exercises);
 });
 

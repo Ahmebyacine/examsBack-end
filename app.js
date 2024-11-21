@@ -17,7 +17,7 @@ connectDB();
 
 //middlewares
 app.use(cors());
-app.use(express.json({limit:'10Kb'}));
+app.use(express.json());
 // limited req 7000 req in 5 minute
 const limiter = rateLimit({
 	windowMs: 5 * 60 * 1000,

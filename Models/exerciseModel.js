@@ -16,11 +16,11 @@ const exerciseSchema = new mongoose.Schema({
       }
     }
   ],
-  level: { type: String, required: true },
+  level: { type: mongoose.Schema.Types.ObjectId, ref: 'Levels', required: true },
   Trimester: { type: String, required: true },
   difficulty: { type: String, required: true },
-  material: { type: String, required: true },
-  unit: { type: String, required: true }
+  material: { type: mongoose.Schema.Types.ObjectId, ref: 'Matriels', required: true },
+  unit: { type: mongoose.Schema.Types.ObjectId, ref: 'Units', required: true }
 });
 
 const Exercise = mongoose.model('Exercise', exerciseSchema);
