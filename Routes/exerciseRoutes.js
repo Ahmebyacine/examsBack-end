@@ -6,7 +6,7 @@ const router = express.Router();
 // @desc    Create a new exercise
 // @route   POST /api/exercises
 // @access  Public (adjust according to your use case)
-router.post('/',upload.single('image'), addExercise);
+router.post('/',upload.array('images', 2), addExercise);
 
 // @desc    Get all exercises
 // @route   GET /api/exercises

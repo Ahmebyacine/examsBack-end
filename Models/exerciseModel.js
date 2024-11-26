@@ -10,6 +10,7 @@ const exerciseSchema = new mongoose.Schema({
          answer: { type: String, required: true } }
       ],
       image: { type: String, default: null },
+      secondImage: { type: String, default: null },
       imagePosition: {
         type: String,
         enum: ['top', 'bottom', 'left', 'right']

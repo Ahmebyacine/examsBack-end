@@ -4,25 +4,29 @@ const ApiError = require('../utils/ApiError');
 
 // @desc    Create a new exercise
 // @route   POST /api/exercises
-// @access  Public (adjust according to your use case)
+// @access  Private
 // Add Exercise
 exports.addExercise = asyncHandler(async (req, res, next) => {
   const { title, exercise, level, Trimester, difficulty, material, unit } = req.body;
 
-
+  // Check if all required fields are provided
   if (!title || !exercise || !level || !Trimester || !difficulty || !material || !unit) {
-    return next(new ApiError('Exercise not added', 404));
+    return next(new ApiError('Exercise not added, all fields are required', 400));
   }
+
+  // Parse the exercise data if it's a string
   let parsedExercise = typeof exercise === 'string' ? JSON.parse(exercise) : exercise;
 
-  // If an image file was uploaded, set the image path
-  if (req.file) {
-    parsedExercise = parsedExercise.map((item) => ({
+  // If image files were uploaded, set the image paths
+  if (req.files && req.files.length > 0) {
+    parsedExercise = parsedExercise.map((item, index) => ({
       ...item,
-      image: req.file.path
+      image: req.files[index] ? req.files[index].path : null,
+      secondImage: req.files[index + 1] ? req.files[index + 1].path : null,
     }));
   }
 
+  // Create the new exercise document
   const newExercise = new Exercise({
     title,
     exercise: parsedExercise,
@@ -33,7 +37,10 @@ exports.addExercise = asyncHandler(async (req, res, next) => {
     unit
   });
 
+  // Save the new exercise to the database
   const createdExercise = await newExercise.save();
+
+  // Return the newly created exercise
   res.status(201).json(createdExercise);
 });
 
@@ -60,7 +67,7 @@ exports.getExercise= asyncHandler(async (req, res,next) => {
 
 // @desc    Update an exercise
 // @route   PUT /api/exercises/:id
-// @access  Public
+// @access  Private
 exports.updateExercise=asyncHandler(async (req, res,next) => {
   const { title, exercise, level, Trimester, difficulty, material, unit } = req.body;
 
@@ -83,7 +90,7 @@ exports.updateExercise=asyncHandler(async (req, res,next) => {
 
 // @desc    Delete an exercise
 // @route   DELETE /api/exercises/:id
-// @access  Public
+// @access  Private
 exports.deleteExercise= asyncHandler(async (req, res,next) => {
   const exerciseToDelete = await Exercise.findById(req.params.id);
 
