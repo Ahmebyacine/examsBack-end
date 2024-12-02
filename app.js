@@ -9,6 +9,8 @@ const exerciseRoutes = require('./Routes/exerciseRoutes');
 const matrielRoutes = require('./Routes/matrielRoutes');
 const levelRoutes = require('./Routes/levelRoutes');
 const unitRoutes = require('./Routes/unitRoutes');
+const userRoutes = require('./Routes/userRoutes');
+const authRoutes = require('./Routes/authRoutes');
 
 
 const app = express();
@@ -30,10 +32,12 @@ app.use(hpp());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // endPionts API
+app.use('/api/auth', authRoutes);
 app.use('/api/exercises', exerciseRoutes);
 app.use('/api/matriels', matrielRoutes);
 app.use('/api/levels', levelRoutes);
 app.use('/api/units', unitRoutes);
+app.use('/api/user', userRoutes);
 
 
 // Global error handling middleware for express

@@ -8,7 +8,7 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/');
   },
   filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
   }
 });
@@ -22,7 +22,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Create multer instance
+// Export multer instance
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter
