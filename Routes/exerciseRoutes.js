@@ -1,5 +1,5 @@
 const express = require('express');
-const { deleteExercise, updateExercise, allExercise, getExercise, addExercise, getUserExercises } = require('../Services/exerciseServices');
+const { deleteExercise, updateExercise, allExercise, getExercise, addExercise, getUserExercises,getAllArchivedExams } = require('../Services/exerciseServices');
 const upload = require('../middlewares/upload');
 const { protect } = require('../Services/authServices');
 const router = express.Router();
@@ -14,10 +14,14 @@ router.post('/',upload.array('images', 2), addExercise);
 // @access  Private
 router.get('/', allExercise);
 
-// @desc    Get all exercises
-// @route   GET /api/exercises
-// @access  Public
+// @desc    Get all exercises for user
+// @route   GET /api/exercises/user
+// @access  private
 router.get('/user',protect, getUserExercises);
+// @desc    Get all exams archives for user
+// @route   GET /api/exercises/archivesExams
+// @access  private
+router.get('/archivedExams',protect, getAllArchivedExams);
 
 // @desc    Get a single exercise by ID
 // @route   GET /api/exercises/:id

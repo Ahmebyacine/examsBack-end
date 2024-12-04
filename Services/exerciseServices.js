@@ -105,6 +105,27 @@ exports.getUserExercises=   asyncHandler(async (req, res) => {
  const addedExercise = user.current.map(ex => ex._id);
   res.status(200).json({ exercises, favoriteIds, addedExercise});
 });
+
+exports.getAllArchivedExams = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id;
+
+  // Find the user by ID and populate exercises in archived_exam
+  const user = await User.findById(userId).populate('archived_exam.exercises');
+
+  if (!user) {
+    return next(new ApiError('User not found', 404));
+  }
+
+  // Extract all archived exams
+  const archivedExams = user.archived_exam;
+
+  res.status(200).json({
+    archivedExams: archivedExams.map(exam => ({
+      exercises: exam.exercises,
+      created_at: exam.created_at,
+    })),
+  });
+});
 // @desc    Update an exercise
 // @route   PUT /api/exercises/:id
 // @access  Private
