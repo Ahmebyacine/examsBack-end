@@ -65,9 +65,35 @@ exports.addExercise = asyncHandler(async (req, res, next) => {
 // @desc    Get all exercises
 // @route   GET /api/exercises
 // @access  private
-exports.allExercise= asyncHandler(async (req, res) => {
-  const exercises = await Exercise.find().populate('level').populate('material').populate('unit');
-  res.status(200).json(exercises);
+exports.allExercise = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 10, sort = 'createdAt' } = req.query;
+
+  // Convert page and limit to numbers
+  const pageNumber = parseInt(page, 10);
+  const limitNumber = parseInt(limit, 10);
+
+  // Calculate the number of documents to skip
+  const skip = (pageNumber - 1) * limitNumber;
+
+  // Fetch exercises with pagination and sorting
+  const exercises = await Exercise.find()
+    .populate('level')
+    .populate('material')
+    .populate('unit')
+    .sort(sort)
+    .skip(skip)
+    .limit(limitNumber);
+
+  // Get the total count for exercises
+  const total = await Exercise.countDocuments();
+
+  // Send the response
+  res.status(200).json({
+    total,
+    page: pageNumber,
+    pages: Math.ceil(total / limitNumber),
+    exercises,
+  });
 });
 
 // @desc    Get a single exercise by ID
@@ -83,27 +109,57 @@ exports.getExercise= asyncHandler(async (req, res,next) => {
   res.status(200).json(exercise);
 });
 
-exports.getUserExercises=   asyncHandler(async (req, res) => {
+exports.getUserExercises = asyncHandler(async (req, res,next) => {
   const userId = req.user._id;
+  const { page = 1, limit = 10, sort = 'createdAt' } = req.query;
+
+  // Convert page and limit to numbers
+  const pageNumber = parseInt(page, 10);
+  const limitNumber = parseInt(limit, 10);
+
+  // Calculate the number of documents to skip
+  const skip = (pageNumber - 1) * limitNumber;
 
   // Fetch the user's levels and materials
-  const user = await User.findById(userId).populate('exercise_favorite').populate('current');
+  const user = await User.findById(userId)
+    .populate('exercise_favorite')
+    .populate('current');
+
   if (!user) {
-    res.status(404);
-    throw new Error('User not found');
+    next(new ApiError('User not found', 404))  
   }
 
-  // Fetch exercises that match the user's levels and materials
+  // Fetch exercises that match the user's levels and materials with pagination
   const exercises = await Exercise.find({
     level: { $in: user.levels },
     material: { $in: user.matirels },
   })
     .populate('level')
     .populate('material')
-    .populate('unit');
- const favoriteIds = user.exercise_favorite.map(ex => ex._id);
- const addedExercise = user.current.map(ex => ex._id);
-  res.status(200).json({ exercises, favoriteIds, addedExercise});
+    .populate('unit')
+    .sort(sort)
+    .skip(skip)
+    .limit(limitNumber);
+
+  // Get total count of exercises for pagination metadata
+  const total = await Exercise.countDocuments({
+    level: { $in: user.levels },
+    material: { $in: user.matirels },
+  });
+
+  // Extract favorite and current exercise IDs
+  const favoriteIds = user.exercise_favorite.map((ex) => ex._id);
+  const addedExercise = user.current.map((ex) => ex._id);
+
+  // Send response
+  res.status(200).json({
+    exercises,
+    favoriteIds,
+    addedExercise,
+    total,
+    page: pageNumber,
+    pages: Math.ceil(total / limitNumber),
+  });
 });
 
 exports.getAllArchivedExams = asyncHandler(async (req, res, next) => {
