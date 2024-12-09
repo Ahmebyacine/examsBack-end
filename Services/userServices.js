@@ -112,3 +112,43 @@ exports.currentToArchive=asyncHandler(async (req, res, next) => {
 
     res.status(200).json({ message: 'Current list archived', archivedExam: user.archived_exam });
   })
+  // user services 
+  // admin side 
+  exports.allUsers= asyncHandler(async (req, res) => {
+    const users = await User.find({ role: { $ne: 'admin' }}).populate('levels matirels');
+    res.status(200).json(users);
+  });
+  
+  // Get user by ID
+  exports.getUser=asyncHandler(async (req, res,next) => {
+    const user = await User.findById(req.params.id).populate('levels matirels');
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      return next(new ApiError('User not found', 404));
+    }
+  });
+  
+  // Update user by ID
+  exports.updateUser=asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      Object.assign(user, req.body);
+      const updatedUser = await user.save();
+      res.status(200).json(updatedUser);
+    } else {
+      return next(new ApiError('User not found', 404));
+    }
+  });
+  
+  // Delete user by ID
+  exports.deleteUser=asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      await user.remove();
+      res.status(200).json({ message: 'User deleted' });
+    } else {
+      return next(new ApiError('User not found', 404));
+    }
+  });
+  
