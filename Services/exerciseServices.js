@@ -109,9 +109,9 @@ exports.getExercise= asyncHandler(async (req, res,next) => {
   res.status(200).json(exercise);
 });
 
-exports.getUserExercises = asyncHandler(async (req, res,next) => {
+exports.getUserExercises = asyncHandler(async (req, res, next) => {
   const userId = req.user._id;
-  const { page = 1, limit = 10, sort = 'createdAt' } = req.query;
+  const { page = 1, limit = 10, sort = 'createdAt', favoritesOnly = false } = req.query;
 
   // Convert page and limit to numbers
   const pageNumber = parseInt(page, 10);
@@ -126,30 +126,43 @@ exports.getUserExercises = asyncHandler(async (req, res,next) => {
     .populate('current');
 
   if (!user) {
-    next(new ApiError('User not found', 404))  
+    return next(new ApiError('User not found', 404));
   }
-
-  // Fetch exercises that match the user's levels and materials with pagination
-  const exercises = await Exercise.find({
-    level: { $in: user.levels },
-    material: { $in: user.matirels },
-  })
-    .populate('level')
-    .populate('material')
-    .populate('unit')
-    .sort(sort)
-    .skip(skip)
-    .limit(limitNumber);
-
-  // Get total count of exercises for pagination metadata
-  const total = await Exercise.countDocuments({
-    level: { $in: user.levels },
-    material: { $in: user.matirels },
-  });
 
   // Extract favorite and current exercise IDs
   const favoriteIds = user.exercise_favorite.map((ex) => ex._id);
   const addedExercise = user.current.map((ex) => ex._id);
+
+  let exercises = [];
+  let total = 0;
+
+  if (favoritesOnly === 'true') {
+    exercises = await Exercise.find({ _id: { $in: favoriteIds } })
+      .populate('level')
+      .populate('material')
+      .populate('unit')
+      .sort(sort)
+      .skip(skip)
+      .limit(limitNumber);
+
+    total = favoriteIds.length;
+  } else {
+    exercises = await Exercise.find({
+      level: { $in: user.levels },
+      material: { $in: user.matirels },
+    })
+      .populate('level')
+      .populate('material')
+      .populate('unit')
+      .sort(sort)
+      .skip(skip)
+      .limit(limitNumber);
+
+    total = await Exercise.countDocuments({
+      level: { $in: user.levels },
+      material: { $in: user.matirels },
+    });
+  }
 
   // Send response
   res.status(200).json({
@@ -160,6 +173,25 @@ exports.getUserExercises = asyncHandler(async (req, res,next) => {
     page: pageNumber,
     pages: Math.ceil(total / limitNumber),
   });
+});
+
+exports.getUserCurrentExam = asyncHandler(async (req, res,next) => {
+  const userId = req.user._id;
+
+    // Find the user and populate the current exercises
+    const user = await User.findById(userId)
+      .populate('current');
+
+    if (!user) {
+      next(new ApiError('User not found', 404))  
+    }
+    const exercises = await Exercise.find({
+      _id: { $in: user.current },
+    }).populate('level')
+    .populate('material')
+    .populate('unit');
+
+    res.status(200).json({exercises});
 });
 
 exports.getAllArchivedExams = asyncHandler(async (req, res, next) => {
