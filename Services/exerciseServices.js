@@ -80,7 +80,7 @@ exports.allExercise = asyncHandler(async (req, res) => {
     .populate('level')
     .populate('material')
     .populate('unit')
-    .sort(sort)
+    .sort({ [sort]: 1, _id: 1 })
     .skip(skip)
     .limit(limitNumber);
 
@@ -141,7 +141,7 @@ exports.getUserExercises = asyncHandler(async (req, res, next) => {
       .populate('level')
       .populate('material')
       .populate('unit')
-      .sort(sort)
+      .sort({ [sort]: 1, _id: 1 })
       .skip(skip)
       .limit(limitNumber);
 
@@ -154,7 +154,7 @@ exports.getUserExercises = asyncHandler(async (req, res, next) => {
       .populate('level')
       .populate('material')
       .populate('unit')
-      .sort(sort)
+      .sort({ [sort]: 1, _id: 1 })
       .skip(skip)
       .limit(limitNumber);
 
