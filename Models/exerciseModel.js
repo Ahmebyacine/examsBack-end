@@ -21,7 +21,8 @@ const exerciseSchema = new mongoose.Schema({
   Trimester: { type: String, required: true },
   difficulty: { type: String, required: true },
   material: { type: mongoose.Schema.Types.ObjectId, ref: 'Matriels', required: true },
-  unit: { type: mongoose.Schema.Types.ObjectId, ref: 'Units', required: true }
+  unit: { type: mongoose.Schema.Types.ObjectId, ref: 'Units', required: true },
+  rtl: {type: Boolean, default:false}
 });
 
 const Exercise = mongoose.model('Exercise', exerciseSchema);

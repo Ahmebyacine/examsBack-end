@@ -8,7 +8,7 @@ const ApiError = require('../utils/ApiError');
 // @access  Private
 // Add Exercise
 exports.addExercise = asyncHandler(async (req, res, next) => {
-  const { title, exercise, level, Trimester, difficulty, material, unit } = req.body;
+  const { title, exercise, level, Trimester, difficulty, material, unit,rtl } = req.body;
 
   // Validate required fields
   if (!title || !exercise || !level || !Trimester || !difficulty || !material || !unit) {
@@ -17,7 +17,7 @@ exports.addExercise = asyncHandler(async (req, res, next) => {
 
   // Parse the exercise data if provided as a JSON string
   let parsedExercise = typeof exercise === 'string' ? JSON.parse(exercise) : exercise;
-
+  
   // Handle uploaded image files and assign them to the parsedExercise items
   if (req.files && req.files.length > 0) {
     let fileIndex = 0;
@@ -46,7 +46,7 @@ exports.addExercise = asyncHandler(async (req, res, next) => {
   // Create a new exercise document
   const newExercise = new Exercise({
     title,
-    exercise: parsedExercise,
+    exercise:parsedExercise,
     level,
     Trimester,
     difficulty,
@@ -218,7 +218,7 @@ exports.getAllArchivedExams = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/exercises/:id
 // @access  Private
 exports.updateExercise=asyncHandler(async (req, res,next) => {
-  const { title, exercise, level, Trimester, difficulty, material, unit } = req.body;
+  const { title, exercise, level, Trimester, difficulty, material, unit,rtl } = req.body;
 
   const exerciseToUpdate = await Exercise.findById(req.params.id);
 
@@ -232,6 +232,7 @@ exports.updateExercise=asyncHandler(async (req, res,next) => {
   exerciseToUpdate.difficulty = difficulty || exerciseToUpdate.difficulty;
   exerciseToUpdate.material = material || exerciseToUpdate.material;
   exerciseToUpdate.unit = unit || exerciseToUpdate.unit;
+  exerciseToUpdate.rtl = rtl || exerciseToUpdate.rtl;
 
   const updatedExercise = await exerciseToUpdate.save();
   res.status(200).json(updatedExercise);
