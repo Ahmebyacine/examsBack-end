@@ -20,7 +20,7 @@ router.post('/favorites/delete',protect,removeFavorites);
 
 // Add to Current List
 router.post('/current/add',protect,currentAddExercise);
-// Add to Current List
+// Delete to Current List
 router.post('/current/delete',protect,removeCurrent);
 
 // Archive Current List

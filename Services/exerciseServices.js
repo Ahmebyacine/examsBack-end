@@ -52,6 +52,7 @@ exports.addExercise = asyncHandler(async (req, res, next) => {
     difficulty,
     material,
     unit,
+    rtl,
   });
 
   // Save the exercise to the database
