@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const connectDB = async () => {
     const dbUsername = 'ahmedbelaid1921';
     const dbPassword = 'CEGesX7bVqfcq2H2';
-    const dbName = 'Exams';
+    const dbName = 'ExamsBETA';
     const dbCluster = 'ourproject.ua3pvwu.mongodb.net';
     const dbParams = 'retryWrites=true&w=majority&appName=ourProject';
     
